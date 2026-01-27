@@ -11,7 +11,7 @@
 
 #include <fstream>
 
-#include <wjfilesystem/path.h>
+#include <blocksci/fs.hpp>
 
 struct SimpleFileWriter {
 protected:
@@ -24,20 +24,20 @@ public:
     SimpleFileWriter(filesystem::path path) {
         auto mainParams = std::fstream::out | std::fstream::binary;
         auto extraParams = std::fstream::ate | std::fstream::in;
-        path = filesystem::path{path.str() + ".dat"};
+        path = filesystem::path{path.string() + ".dat"};
         
-        file.open(path.str(), mainParams | extraParams);
+        file.open(path.string(), mainParams | extraParams);
         if (!file.is_open())
         {
             // create
-            file.open(path.str(), mainParams);
+            file.open(path.string(), mainParams);
             
             // close
             if (file.is_open())
                 file.close();
             
             // re-open
-            file.open(path.str(), mainParams | extraParams);
+            file.open(path.string(), mainParams | extraParams);
         }
         lastDataPos = static_cast<size_t>(file.tellp());
     }
@@ -141,7 +141,7 @@ private:
     FixedSizeFileWriter<FileIndex<indexCount>> indexFile;
 public:
     
-    explicit IndexedFileWriter(const filesystem::path &pathPrefix) : dataFile(filesystem::path{pathPrefix.str() + "_data"}), indexFile(filesystem::path{pathPrefix.str() + "_index"}) {}
+    explicit IndexedFileWriter(const filesystem::path &pathPrefix) : dataFile(filesystem::path{pathPrefix.string() + "_data"}), indexFile(filesystem::path{pathPrefix.string() + "_index"}) {}
     
     void writeIndexGroup() {
         FileIndex<indexCount> fileIndex;

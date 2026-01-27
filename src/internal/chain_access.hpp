@@ -19,7 +19,7 @@
 #include <blocksci/core/typedefs.hpp>
 #include <blocksci/core/transaction_data.hpp>
 
-#include <wjfilesystem/path.h>
+#include <blocksci/fs.hpp>
 
 #include <algorithm>
 

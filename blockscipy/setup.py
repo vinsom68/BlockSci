@@ -35,6 +35,24 @@ class CMakeBuild(build_ext):
         extdir = os.path.abspath(os.path.dirname(self.get_ext_fullpath(ext.name)))
         cmake_args = ['-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=' + extdir,
                       '-DPYTHON_EXECUTABLE=' + sys.executable]
+        blocksci_dir = os.environ.get('BLOCKSCI_DIR')
+        if not blocksci_dir:
+            repo_root = os.path.abspath(os.path.join(ext.sourcedir, os.pardir))
+            candidate = os.path.join(repo_root, 'release', 'src')
+            if os.path.exists(os.path.join(candidate, 'blocksci-config.cmake')) or os.path.exists(os.path.join(candidate, 'blocksciConfig.cmake')):
+                blocksci_dir = candidate
+        if blocksci_dir:
+            cmake_args.append('-Dblocksci_DIR=' + blocksci_dir)
+        try:
+            import pybind11  # noqa: F401
+            pybind11_dir = subprocess.check_output(
+                [sys.executable, '-m', 'pybind11', '--cmakedir'],
+                text=True
+            ).strip()
+            if pybind11_dir:
+                cmake_args.append('-Dpybind11_DIR=' + pybind11_dir)
+        except Exception:
+            pass
 
         cfg = 'Debug' if self.debug else 'Release'
         build_args = ['--config', cfg]
@@ -71,7 +89,7 @@ setup(
     install_requires=[
         'multiprocess>=0.70.5',
         'psutil>=5.4.2',
-        'pycrypto>=2.6.1',
+        'pycryptodome>=3.0.0',
         'pandas>=0.22.0',
         'dateparser>=0.6.0',
         'requests>=2.19.1'

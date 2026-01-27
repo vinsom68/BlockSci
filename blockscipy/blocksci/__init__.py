@@ -35,6 +35,41 @@ from .pickler import *
 
 VERSION = "0.7.0"
 
+_ADDRESS_TYPE_STRINGS = {
+    address_type.nonstandard: "Nonstandard",
+    address_type.pubkey: "Pay to pubkey",
+    address_type.pubkeyhash: "Pay to pubkey hash",
+    address_type.multisig_pubkey: "Multisig Public Key",
+    address_type.scripthash: "Pay to script hash",
+    address_type.multisig: "Multisig",
+    address_type.nulldata: "Null data",
+    address_type.witness_pubkeyhash: "Pay to witness pubkey hash",
+    address_type.witness_scripthash: "Pay to witness script hash",
+    address_type.witness_unknown: "Pay to witness unknown",
+}
+
+_ADDRESS_TYPE_REPR_STRINGS = {
+    address_type.nonstandard: "address_type.nonstandard",
+    address_type.pubkey: "address_type.pubkey",
+    address_type.pubkeyhash: "address_type.pubkeyhash",
+    address_type.multisig_pubkey: "address_type.multisig_pubkey",
+    address_type.scripthash: "address_type.scripthash",
+    address_type.multisig: "address_type.multisig",
+    address_type.nulldata: "address_type.nulldata",
+    address_type.witness_pubkeyhash: "address_type.witness_pubkeyhash",
+    address_type.witness_scripthash: "address_type.witness_scripthash",
+    address_type.witness_unknown: "address_type.witness_unknown",
+}
+
+def _address_type_str(val):
+    return _ADDRESS_TYPE_STRINGS.get(val, "Unknown Address Type")
+
+def _address_type_repr(val):
+    return _ADDRESS_TYPE_REPR_STRINGS.get(val, "address_type.unknown")
+
+setattr(address_type, "__str__", _address_type_str)
+setattr(address_type, "__repr__", _address_type_repr)
+
 
 sys.modules['blocksci.proxy'] = proxy
 sys.modules['blocksci.cluster'] = cluster
@@ -91,12 +126,17 @@ def mapreduce_block_ranges(chain, map_func, reduce_func, init=MISSING_PARAM, sta
         file.seek(0)
         return file
 
-    with Pool(cpu_count - 1) as p:
-        results_future = p.map_async(real_map_func, segments[1:])
-        first = map_func(chain[raw_segments[0][0]:raw_segments[0][1]])
-        results = results_future.get()
-        results = [Unpickler(res, chain).load() for res in results]
-    results.insert(0, first)
+    try:
+        with Pool(cpu_count - 1) as p:
+            results_future = p.map_async(real_map_func, segments[1:])
+            first = map_func(chain[raw_segments[0][0]:raw_segments[0][1]])
+            results = results_future.get()
+            results = [Unpickler(res, chain).load() for res in results]
+        results.insert(0, first)
+    except (PermissionError, OSError):
+        logger = logging.getLogger()
+        logger.warning("Multiprocessing is unavailable; falling back to single-threaded execution.")
+        return map_func(chain[start:end])
     if isinstance(init, type(MISSING_PARAM)):
         return reduce(reduce_func, results)
     else:
@@ -539,9 +579,14 @@ def setup_self_methods(main, proxy_obj_type=None, sample_proxy=None):
         def method(s, *args):
             return getattr(s._self_proxy, name)(*args)(s)
 
-        orig_doc = getattr(proxy_obj_type, name).__doc__
-        split = orig_doc.split("\n\n")
-        method.__doc__ = fix_self_doc_def(split[0]) + '\n\n' + split[1]
+        orig_doc = getattr(proxy_obj_type, name).__doc__ or ""
+        split = orig_doc.split("\n\n") if orig_doc else []
+        if len(split) == 2:
+            method.__doc__ = fix_self_doc_def(split[0]) + '\n\n' + split[1]
+        elif split:
+            method.__doc__ = fix_self_doc_def(split[0])
+        else:
+            method.__doc__ = None
         return method
 
     core_properties_methods = set(_get_core_properties_methods(proxy_obj_type)) - existing_properties
@@ -564,7 +609,7 @@ def setup_iterator_methods(iterator, doc_func=fix_iterator_doc_def, nested_proxy
             return apply_map(s._self_proxy, getattr(s._self_proxy.nested_proxy, name))(s)
         prop = property(method)
         prop.__doc__ = "For each item: " + \
-                       getattr(nested_proxy_cl, name).__doc__ + \
+                       (getattr(nested_proxy_cl, name).__doc__ or "") + \
                        "\n\n:type: :class:`" + \
                        apply_map(sample_proxy, getattr(sample_proxy.nested_proxy, name)).output_type_name + \
                        "`"
@@ -574,11 +619,14 @@ def setup_iterator_methods(iterator, doc_func=fix_iterator_doc_def, nested_proxy
         def method(rng, *args):
             return apply_map(rng._self_proxy, getattr(rng._self_proxy.nested_proxy, name)(*args))(rng)
 
-        orig_doc = getattr(nested_proxy_cl, name).__doc__
-        split = orig_doc.split("\n\n")
-        if len(split) != 2:
-            print(iterator, name)
-        method.__doc__ = doc_func(split[0]) + '\n\nFor each item: ' + split[1]
+        orig_doc = getattr(nested_proxy_cl, name).__doc__ or ""
+        split = orig_doc.split("\n\n") if orig_doc else []
+        if len(split) == 2:
+            method.__doc__ = doc_func(split[0]) + '\n\nFor each item: ' + split[1]
+        elif split:
+            method.__doc__ = doc_func(split[0])
+        else:
+            method.__doc__ = None
         return method
 
     for proxy_func in _get_core_properties_methods(nested_proxy_cl):

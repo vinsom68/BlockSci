@@ -35,7 +35,7 @@ void printOk(std::string str) {
 }
 
 
-BlockSciDoctor::BlockSciDoctor(filesystem::path _configFilePath) : configFilePath(_configFilePath), config(blocksci::loadBlockchainConfig(_configFilePath.str(), true, 0)), jsonConf(blocksci::loadConfig(configFilePath.str())) {
+BlockSciDoctor::BlockSciDoctor(filesystem::path _configFilePath) : configFilePath(_configFilePath), config(blocksci::loadBlockchainConfig(_configFilePath.string(), true, 0)), jsonConf(blocksci::loadConfig(configFilePath.string())) {
     blocksci::checkVersion(jsonConf);
 }
 
@@ -45,7 +45,7 @@ void BlockSciDoctor::checkConfigFile() {
     blocksci::ChainConfiguration chainConfig = jsonConf.at("chainConfig");
 
     auto dataDirectory = chainConfig.dataDirectory;
-    if(!dataDirectory.exists()) {
+    if(!filesystem::exists(dataDirectory)) {
         printWarning("Data directory does not exist.");
         warnings += 1;
 
@@ -82,10 +82,10 @@ void BlockSciDoctor::checkConfigFile() {
         auto coinDirectory = diskConfig.coinDirectory;
         auto blockDirectory = coinDirectory/"blocks";
 
-        if(!coinDirectory.exists()) {
+        if(!filesystem::exists(coinDirectory)) {
             printError("Coin directory does not exist.");
             errors += 1;
-        } else if(coinDirectory.exists() && !blockDirectory.exists()) {
+        } else if(filesystem::exists(coinDirectory) && !filesystem::exists(blockDirectory)) {
             printError("Coin directory does not contain blocks subdirectory.");
             errors += 1;
         }
@@ -104,7 +104,7 @@ void BlockSciDoctor::rebuildChainIndex() {
     blocksci::BlockHeight maxBlock = parserConf.at("maxBlockNum");
     ChainDiskConfiguration diskConfig = parserConf.at("disk");
 
-    blocksci::DataConfiguration dataConfig{configFilePath.str(), chainConfig, true, 0};
+    blocksci::DataConfiguration dataConfig{configFilePath.string(), chainConfig, true, 0};
     ParserConfiguration<FileTag> config{dataConfig, diskConfig};
 
     ChainIndex<FileTag> index = ChainIndex<FileTag>{};
@@ -135,7 +135,7 @@ void BlockSciDoctor::checkDiskSpace() {
     auto dataDirectory = chainConfig.dataDirectory;
 
     struct statvfs stats;
-    statvfs(dataDirectory.str().c_str(), &stats);
+    statvfs(dataDirectory.string().c_str(), &stats);
     auto diskSize = stats.f_frsize * stats.f_bavail / (1024*1024*1024);
 
     if(diskSize < 20) {

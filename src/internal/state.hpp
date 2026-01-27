@@ -11,6 +11,9 @@
 #include <blocksci/core/dedup_address_type.hpp>
 
 #include <array>
+#include <cstdint>
+#include <istream>
+#include <ostream>
 
 namespace blocksci {
     class ChainAccess;

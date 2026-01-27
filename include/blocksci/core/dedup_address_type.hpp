@@ -12,6 +12,11 @@
 
 #include <blocksci/core/meta.hpp>
 
+#include <array>
+#include <cstddef>
+#include <functional>
+#include <tuple>
+
 #define DEDUP_ADDRESS_TYPE_LIST VAL(SCRIPTHASH), VAL(PUBKEY), VAL(MULTISIG), VAL(NULL_DATA), VAL(WITNESS_UNKNOWN), VAL(NONSTANDARD)
 
 namespace blocksci {

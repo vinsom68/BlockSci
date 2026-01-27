@@ -16,7 +16,7 @@
 #include <blocksci/core/meta.hpp>
 #include <blocksci/core/script_data.hpp>
 
-#include <wjfilesystem/path.h>
+#include <blocksci/fs.hpp>
 
 #include <tuple>
 

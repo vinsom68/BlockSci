@@ -29,10 +29,10 @@ AddressState::AddressState(filesystem::path path_, HashIndexCreator &hashDb) : p
     blocksci::for_each(multiAddressMaps, [&](auto &multiAddressMap) {
         std::stringstream ss;
         ss << multiAddressFileName << "_" << dedupAddressName(multiAddressMap.type) << ".dat";
-        multiAddressMap.unserialize((path/ss.str()).str());
+        multiAddressMap.unserialize((path/ss.str()).string());
     });
     
-    std::ifstream inputFile((path/std::string(scriptCountsFileName)).str());
+    std::ifstream inputFile((path/std::string(scriptCountsFileName)).string());
     
     if (inputFile) {
         uint32_t value;
@@ -50,10 +50,10 @@ AddressState::~AddressState() {
     blocksci::for_each(multiAddressMaps, [&](auto &multiAddressMap) {
         std::stringstream ss;
         ss << multiAddressFileName << "_" << dedupAddressName(multiAddressMap.type) << ".dat";
-        multiAddressMap.serialize((path/ss.str()).str());
+        multiAddressMap.serialize((path/ss.str()).string());
     });
     
-    std::ofstream outputFile((path/std::string(scriptCountsFileName)).str());
+    std::ofstream outputFile((path/std::string(scriptCountsFileName)).string());
     for (auto value : scriptIndexes) {
         outputFile << value << " ";
     }

@@ -31,6 +31,7 @@
 #include <iostream>
 #include <future>
 #include <sstream>
+#include <thread>
 #include <unordered_map>
 
 #include <csignal>
@@ -48,7 +49,7 @@ void term(int)
 
 int initializeRecordingFile(Blockchain &chain) {
     auto mempoolDir = chain.getAccess().config.mempoolDirectory();
-    if (!mempoolDir.exists()){
+    if (!filesystem::exists(mempoolDir)){
         filesystem::create_directory(mempoolDir);
     }
     auto mostRecentBlock = chain[static_cast<int>(chain.size()) - 1];
@@ -276,7 +277,7 @@ int main(int argc, char * argv[]) {
     }
     
     filesystem::path configFilePath = {configFilePathString};
-    auto jsonConf = blocksci::loadConfig(configFilePath.str());
+    auto jsonConf = blocksci::loadConfig(configFilePath.string());
     blocksci::checkVersion(jsonConf);
     
     blocksci::ChainRPCConfiguration rpcConfig = jsonConf.at("parser").at("rpc");
@@ -298,7 +299,7 @@ int main(int argc, char * argv[]) {
         }
     }
     
-    MempoolRecorder recorder{configFilePath.str(), bitcoinAPI};
+    MempoolRecorder recorder{configFilePath.string(), bitcoinAPI};
     
     int updateCount = 0;
     while(!done) {

@@ -11,9 +11,6 @@ target_include_directories(variant INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/variant
 add_library(ranges INTERFACE)
 target_include_directories(ranges INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/range-v3/include/)
 
-add_library(filesystem INTERFACE)
-target_include_directories(filesystem INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/filesystem/include/)
-
 add_library(mio INTERFACE)
 target_include_directories(mio INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/mio/include/)
 
@@ -96,6 +93,9 @@ endif()
 option(WITH_TESTS "" OFF)
 option(WITH_TOOLS "" OFF)
 option(WITH_GFLAGS "" OFF)
+# RocksDB toggles
+set(WITH_BENCHMARK_TOOLS OFF CACHE BOOL "" FORCE)
+set(WITH_CORE_TOOLS OFF CACHE BOOL "" FORCE)
 # Turn jemalloc off to fix undefined reference to `malloc_stats_print'
 option(WITH_JEMALLOC "" OFF)
 option(WITH_SNAPPY "" OFF)
@@ -103,10 +103,15 @@ option(WITH_LZ4 "" ON)
 option(WITH_ZLIB "" OFF)
 option(WITH_BZ2 "" OFF)
 option(WITH_ZSTD "" OFF)
+set(WITH_FOLLY_DISTRIBUTED_MUTEX OFF CACHE BOOL "" FORCE)
 
 
 # rocksdb
 
+set(ROCKSDB_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(ROCKSDB_BUILD_BENCHMARKS OFF CACHE BOOL "" FORCE)
+set(ROCKSDB_BUILD_TOOLS OFF CACHE BOOL "" FORCE)
+set(ROCKSDB_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 add_subdirectory(rocksdb EXCLUDE_FROM_ALL)
 
 add_library(rocksdb_headers INTERFACE)

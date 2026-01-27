@@ -19,9 +19,11 @@
 
 #include <cereal/archives/binary.hpp>
 
+#include <chrono>
 #include <cmath>
 #include <future>
 #include <iostream>
+#include <thread>
 
 #ifdef BLOCKSCI_FILE_PARSER
 
@@ -42,7 +44,7 @@ BlockInfoBase(
 
 int maxBlockFileNum(int startFile, const ParserConfiguration<FileTag> &config) {
     int fileNum = startFile;
-    while (config.pathForBlockFile(fileNum).exists()) {
+    while (filesystem::exists(config.pathForBlockFile(fileNum))) {
         fileNum++;
     }
     return fileNum - 1;
@@ -96,7 +98,7 @@ namespace {
 
 std::vector<BlockInfo<FileTag>> readBlocksInfo(int fileNum, const ParserConfiguration<FileTag> &config) {
     auto blockFilePath = config.pathForBlockFile(fileNum);
-    SafeMemReader reader{blockFilePath.str()};
+    SafeMemReader reader{blockFilePath.string()};
     return readBlocksImpl(reader, fileNum, config.diskConfig);
 }
 
@@ -134,7 +136,7 @@ void ChainIndex<FileTag>::update(const ConfigType &config, blocksci::BlockHeight
                 activeThreads++;
                 // Determine block file path
                 auto blockFilePath = localConfig.pathForBlockFile(fileNum);
-                SafeMemReader reader{blockFilePath.str()};
+                SafeMemReader reader{blockFilePath.string()};
                 // Logic for resume from last processed block, note blockStartOffset and length below
                 if (fileNum == firstFile) {
                     reader.reset(filePos);

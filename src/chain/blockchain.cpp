@@ -36,7 +36,7 @@ namespace blocksci {
     Blockchain::~Blockchain() = default;
     
     std::string Blockchain::dataLocation() const {
-        return access->config.chainConfig.dataDirectory.str();
+        return access->config.chainConfig.dataDirectory.string();
     }
     
     std::string Blockchain::configLocation() const {
@@ -49,7 +49,7 @@ namespace blocksci {
     }
 
     bool Blockchain::isParserRunning() {
-        return access->config.pidFilePath().exists();
+        return filesystem::exists(access->config.pidFilePath());
     }
     
     uint32_t txCount(Blockchain &chain) {

@@ -92,6 +92,10 @@ target_compile_features(blocksci PUBLIC ${BLOCKSCI_FEATURE_REQUIREMENTS})
 
 target_compile_options(blocksci PRIVATE -Wall -Wextra -Wpedantic)
 
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+target_compile_options(blocksci PRIVATE -Wno-changes-meaning)
+endif()
+
 if(CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 target_compile_options(blocksci PRIVATE -Weverything -Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-old-style-cast -Wno-documentation-unknown-command -Wno-documentation -Wno-shadow -Wno-covered-switch-default -Wno-missing-prototypes -Wno-weak-vtables -Wno-unused-macros -Wno-padded)
 endif()
@@ -102,7 +106,6 @@ target_link_libraries( blocksci
   PRIVATE
     blocksci_internal
     dset
-    filesystem
     secp256k1
 )
 

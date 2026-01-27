@@ -11,10 +11,11 @@
 
 #include <mio/mmap.hpp>
 
-#include <wjfilesystem/path.h>
+#include <blocksci/fs.hpp>
 
 #include <array>
 #include <cassert>
+#include <cstdint>
 #include <fstream>
 #include <cstring>
 #include <limits>
@@ -66,21 +67,21 @@ namespace blocksci {
         FileInfo(filesystem::path path_) : path(std::move(path_)) {}
         
         bool exists() const {
-            return path.exists();
+            return filesystem::exists(path);
         }
         
         OffsetType size() const {
-            return static_cast<OffsetType>(path.file_size());
+            return static_cast<OffsetType>(filesystem::file_size(path));
         }
         
         void resize(OffsetType offset) {
-            path.resize_file(static_cast<size_t>(offset));
+            filesystem::resize_file(path, static_cast<std::uintmax_t>(offset));
         }
         
         void create(OffsetType offset) {
             assert(!exists());
             
-            std::fstream s{path.str(), std::fstream::out | std::fstream::binary};
+            std::fstream s{path.string(), std::fstream::out | std::fstream::binary};
             s.seekp(static_cast<int64_t>(offset - 1));
             s.write("", 1);
         }
@@ -136,13 +137,13 @@ namespace blocksci {
         FileInfo fileInfo;
     public:
         
-        SimpleFileMapper(const filesystem::path &path_) : fileInfo(path_.str() + ".dat") {
+        SimpleFileMapper(const filesystem::path &path_) : fileInfo(path_.string() + ".dat") {
             openFile();
         }
         
         void openFile() {
             std::error_code error;
-            file.map(fileInfo.path.str(), 0, mio::map_entire_file, error);
+            file.map(fileInfo.path.string(), 0, mio::map_entire_file, error);
 //            if(error) {
 //                throw error;
 //            }
@@ -214,14 +215,14 @@ namespace blocksci {
     public:
         static constexpr auto mode = mio::access_mode::write;
         
-        SimpleFileMapper(const filesystem::path &path) : fileInfo(path.str() + ".dat") {
+        SimpleFileMapper(const filesystem::path &path) : fileInfo(path.string() + ".dat") {
             openFile();
             writePos = size();
         }
         
         void openFile() {
             std::error_code error;
-            file.map(fileInfo.path.str(), 0, mio::map_entire_file, error);
+            file.map(fileInfo.path.string(), 0, mio::map_entire_file, error);
 //            if(error) {
 //                throw error;
 //            }
@@ -540,7 +541,7 @@ namespace blocksci {
         }
         
     public:
-        explicit IndexedFileMapper(const filesystem::path &pathPrefix) : dataFile(pathPrefix.str() + "_data"), indexFile(pathPrefix.str() + "_index") {
+        explicit IndexedFileMapper(const filesystem::path &pathPrefix) : dataFile(pathPrefix.string() + "_data"), indexFile(pathPrefix.string() + "_index") {
         }
         
         void reload() {

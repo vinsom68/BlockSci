@@ -60,7 +60,7 @@ class AddressState {
     class AddressBloomFilter : public BloomFilter  {
     public:
         static constexpr auto type = scriptType;
-        AddressBloomFilter(const filesystem::path &path) : BloomFilter(filesystem::path(path.str() + dedupAddressName(type)).str(), startingCount<scriptType>, AddressFalsePositiveRate)  {}
+        AddressBloomFilter(const filesystem::path &path) : BloomFilter(filesystem::path(path.string() + dedupAddressName(type)).string(), startingCount<scriptType>, AddressFalsePositiveRate)  {}
     };
 
     template<blocksci::DedupAddressType::Enum scriptType>

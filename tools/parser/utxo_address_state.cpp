@@ -8,7 +8,7 @@
 #include "utxo_address_state.hpp"
 #include "script_output.hpp"
 
-#include <wjfilesystem/path.h>
+#include <blocksci/fs.hpp>
 
 void UTXOAddressState::addOutput(const AnySpendData &spendData, const blocksci::InoutPointer &pointer) {
     mpark::visit([&](const auto &spendData) { this->addOutput(spendData, pointer); }, spendData.wrapped);
@@ -38,7 +38,7 @@ void UTXOAddressState::unserialize(const std::string &path) {
         ss << addressName(addressTypeState.type);
         ss << ".dat";
         auto fullPath = filesystem::path{path} / ss.str();
-        addressTypeState.unserialize(fullPath.str());
+        addressTypeState.unserialize(fullPath.string());
     });
 }
 
@@ -48,6 +48,6 @@ void UTXOAddressState::serialize(const std::string &path) {
         ss << addressName(addressTypeState.type);
         ss << ".dat";
         auto fullPath = filesystem::path{path} / ss.str();
-        addressTypeState.serialize(fullPath.str());
+        addressTypeState.serialize(fullPath.string());
     });
 }

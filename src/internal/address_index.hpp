@@ -17,7 +17,7 @@
 
 #include <rocksdb/db.h>
 
-#include <wjfilesystem/path.h>
+#include <blocksci/fs.hpp>
 
 #include <memory>
 #include <unordered_set>

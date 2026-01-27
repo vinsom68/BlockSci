@@ -31,7 +31,7 @@
 
 #include <clipp.h>
 
-#include <wjfilesystem/path.h>
+#include <blocksci/fs.hpp>
 
 #include <cereal/archives/binary.hpp>
 
@@ -50,12 +50,12 @@ using json = nlohmann::json;
 void lockDataDirectory(const blocksci::DataConfiguration &dataConfig) {
     filesystem::path pidFile = dataConfig.pidFilePath();
 
-    if(pidFile.exists()) {
+    if(filesystem::exists(pidFile)) {
         std::cout << "A PID file exists in the data directory, another parser instance might already be running. Aborting." << std::endl;
         exit(1);
     } else {
         std::cout << "Locking data directory." << std::endl;
-        std::ofstream rawFile(pidFile.str());
+        std::ofstream rawFile(pidFile.string());
         rawFile << getpid();
         rawFile.close();
     }
@@ -68,8 +68,8 @@ void lockDataDirectory(const ParserConfigurationBase &config) {
 void unlockDataDirectory(const blocksci::DataConfiguration &dataConfig) {
     std::cout << "Unlocking data directory." << std::endl;
     filesystem::path pidFile = dataConfig.pidFilePath();
-    if(pidFile.exists()) {
-        pidFile.remove_file();
+    if(filesystem::exists(pidFile)) {
+        filesystem::remove(pidFile);
     }
 }
 
@@ -94,7 +94,7 @@ std::vector<blocksci::RawBlock> updateChain(const ParserConfiguration<ParserTag>
      */
     auto chainBlocks = [&]() {
         ChainIndex<ParserTag> index;
-        std::ifstream inFile(config.blockListPath().str(), std::ios::binary);
+        std::ifstream inFile(config.blockListPath().string(), std::ios::binary);
         if (inFile.good()) {
             try {
                 cereal::BinaryInputArchive ia(inFile);
@@ -107,7 +107,7 @@ std::vector<blocksci::RawBlock> updateChain(const ParserConfiguration<ParserTag>
         
         index.update(config, maxBlockNum);
         auto blocks = index.generateChain(maxBlockNum);
-        std::ofstream of(config.blockListPath().str(), std::ios::binary);
+        std::ofstream of(config.blockListPath().string(), std::ios::binary);
         cereal::BinaryOutputArchive oa(of);
         oa(index);
         return blocks;
@@ -176,9 +176,9 @@ std::vector<blocksci::RawBlock> updateChain(const ParserConfiguration<ParserTag>
     AddressState addressState{config.addressPath(), hashDb};
     UTXOScriptState utxoScriptState;
     
-    utxoAddressState.unserialize(config.utxoAddressStatePath().str());
-    utxoState.unserialize(config.utxoCacheFile().str());
-    utxoScriptState.unserialize(config.utxoScriptStatePath().str());
+    utxoAddressState.unserialize(config.utxoAddressStatePath().string());
+    utxoState.unserialize(config.utxoCacheFile().string());
+    utxoScriptState.unserialize(config.utxoScriptStatePath().string());
     
     std::vector<blocksci::RawBlock> newBlocks;
     auto it = blocksToAdd.begin();
@@ -204,9 +204,9 @@ std::vector<blocksci::RawBlock> updateChain(const ParserConfiguration<ParserTag>
         backUpdateTxes(config);
     }
     
-    utxoAddressState.serialize(config.utxoAddressStatePath().str());
-    utxoState.serialize(config.utxoCacheFile().str());
-    utxoScriptState.serialize(config.utxoScriptStatePath().str());
+    utxoAddressState.serialize(config.utxoAddressStatePath().string());
+    utxoState.serialize(config.utxoCacheFile().string());
+    utxoScriptState.serialize(config.utxoScriptStatePath().string());
     return newBlocks;
 }
 
@@ -233,18 +233,18 @@ void updateAddressDB(const ParserConfigurationBase &config) {
 }
 
 ParserConfigurationBase getBaseConfig(const filesystem::path &configPath) {
-    if (!configPath.exists()) {
+    if (!filesystem::exists(configPath)) {
         throw std::runtime_error("Config path does not exist");
     }
-    return {blocksci::loadBlockchainConfig(configPath.str(), true, 0)};
+    return {blocksci::loadBlockchainConfig(configPath.string(), true, 0)};
 }
 
 void updateChain(const filesystem::path &configFilePath, bool fullParse) {
-    auto jsonConf = blocksci::loadConfig(configFilePath.str());
+    auto jsonConf = blocksci::loadConfig(configFilePath.string());
     blocksci::checkVersion(jsonConf);
     
     blocksci::ChainConfiguration chainConfig = jsonConf.at("chainConfig");
-    blocksci::DataConfiguration dataConfig{configFilePath.str(), chainConfig, true, 0};
+    blocksci::DataConfiguration dataConfig{configFilePath.string(), chainConfig, true, 0};
     
     ParserConfigurationBase config{dataConfig};
     HashIndexCreator hashDb(config, config.dataConfig.hashIndexFilePath());
@@ -375,7 +375,7 @@ int main(int argc, char * argv[]) {
 
     filesystem::path configFilePath = {configFilePathString};
     auto folder = configFilePath.parent_path();
-    if (!configFilePath.parent_path().exists()) {
+    if (!filesystem::exists(configFilePath.parent_path())) {
         filesystem::create_directory(configFilePath.parent_path());
     }
 
@@ -386,14 +386,14 @@ int main(int argc, char * argv[]) {
             blocksci::ChainRPCConfiguration rpcConfig;
             
             filesystem::path dataDirectoryPath{dataDirectory};
-            if (!dataDirectoryPath.exists()) {
+            if (!filesystem::exists(dataDirectoryPath)) {
                 filesystem::create_directory(dataDirectoryPath);
             }
             
-            dataDirectory = dataDirectoryPath.make_absolute().str();
+            dataDirectory = filesystem::absolute(dataDirectoryPath).string();
             
             if (enableDisk) {
-                coinDirectoryString = filesystem::path{coinDirectoryString}.make_absolute().str();
+                coinDirectoryString = filesystem::absolute(filesystem::path{coinDirectoryString}).string();
             }
             
             if (coinType == "bitcoin") {
@@ -480,7 +480,7 @@ int main(int argc, char * argv[]) {
                 {"parser", parser}
             };
             
-            std::ofstream rawConf(configFilePath.str());
+            std::ofstream rawConf(configFilePath.string());
             rawConf << std::setw(4) << jsonConf;
             
             break;

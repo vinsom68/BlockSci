@@ -25,7 +25,7 @@ namespace blocksci {
     }
     
     void createDirectory(const filesystem::path &dir) {
-        if(!dir.exists()){
+        if(!filesystem::exists(dir)){
             filesystem::create_directory(dir);
         }
     }
@@ -33,13 +33,13 @@ namespace blocksci {
     json loadConfig(const std::string &configFilePath) {
         filesystem::path configFile{configFilePath};
         
-        if(!configFile.exists() || !configFile.is_file()) {
+        if(!filesystem::exists(configFile) || !filesystem::is_regular_file(configFile)) {
             std::stringstream ss;
-            ss << "Error, path " << configFile.str() << " must point to to existing blocksci config file";
+            ss << "Error, path " << configFile.string() << " must point to to existing blocksci config file";
             throw std::runtime_error(ss.str());
         }
         
-        std::ifstream rawConf(configFile.str());
+        std::ifstream rawConf(configFile.string());
         json jsonConf;
         rawConf >> jsonConf;
         return jsonConf;

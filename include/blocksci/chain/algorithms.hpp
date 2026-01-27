@@ -24,20 +24,25 @@
 
 namespace blocksci {
     
-    CPP_template(typename B)(requires ranges::range<B>)
-    CPP_concept_bool isOutputPointerRange = std::is_same<ranges::range_value_t<B>, OutputPointer>::value;
+    template <typename B>
+    inline constexpr bool isOutputPointerRange =
+        ranges::range<B> && std::is_same<ranges::range_value_t<B>, OutputPointer>::value;
     
-    CPP_template(typename B)(requires ranges::range<B>)
-    CPP_concept_bool isInputRange = std::is_same<ranges::range_value_t<B>, Input>::value;
+    template <typename B>
+    inline constexpr bool isInputRange =
+        ranges::range<B> && std::is_same<ranges::range_value_t<B>, Input>::value;
     
-    CPP_template(typename B)(requires ranges::range<B>)
-    CPP_concept_bool isOutputRange = std::is_same<ranges::range_value_t<B>, Output>::value;
+    template <typename B>
+    inline constexpr bool isOutputRange =
+        ranges::range<B> && std::is_same<ranges::range_value_t<B>, Output>::value;
     
-    CPP_template(typename B)(requires ranges::range<B>)
-    CPP_concept_bool isTxRange = std::is_same<ranges::range_value_t<B>, Transaction>::value;
+    template <typename B>
+    inline constexpr bool isTxRange =
+        ranges::range<B> && std::is_same<ranges::range_value_t<B>, Transaction>::value;
     
-    CPP_template(typename B)(requires ranges::range<B>)
-    CPP_concept_bool isBlockRange = std::is_same<ranges::range_value_t<B>, Block>::value;
+    template <typename B>
+    inline constexpr bool isBlockRange =
+        ranges::range<B> && std::is_same<ranges::range_value_t<B>, Block>::value;
     
     template <typename B>
     CPP_concept_bool isTx = std::is_same<B, Transaction>::value;
@@ -45,17 +50,21 @@ namespace blocksci {
     template <typename B>
     CPP_concept_bool isBlockchain = std::is_same<B, Blockchain>::value;
     
-    CPP_template(typename B)(requires ranges::range<B>)
-    CPP_concept_bool isOptionalInputRange = std::is_same<ranges::range_value_t<B>, ranges::optional<Input>>::value;
+    template <typename B>
+    inline constexpr bool isOptionalInputRange =
+        ranges::range<B> && std::is_same<ranges::range_value_t<B>, ranges::optional<Input>>::value;
     
-    CPP_template(typename B)(requires ranges::range<B>)
-    CPP_concept_bool isOptionalOutputRange = std::is_same<ranges::range_value_t<B>, ranges::optional<Output>>::value;
+    template <typename B>
+    inline constexpr bool isOptionalOutputRange =
+        ranges::range<B> && std::is_same<ranges::range_value_t<B>, ranges::optional<Output>>::value;
     
-    CPP_template(typename B)(requires ranges::range<B>)
-    CPP_concept_bool isOptionalTxRange = std::is_same<ranges::range_value_t<B>, ranges::optional<Transaction>>::value;
+    template <typename B>
+    inline constexpr bool isOptionalTxRange =
+        ranges::range<B> && std::is_same<ranges::range_value_t<B>, ranges::optional<Transaction>>::value;
     
-    CPP_template(typename B)(requires ranges::range<B>)
-    CPP_concept_bool isOptionalBlockRange = std::is_same<ranges::range_value_t<B>, ranges::optional<Block>>::value;
+    template <typename B>
+    inline constexpr bool isOptionalBlockRange =
+        ranges::range<B> && std::is_same<ranges::range_value_t<B>, ranges::optional<Block>>::value;
     
     template<typename T>
     struct fail_helper : std::false_type

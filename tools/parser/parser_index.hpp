@@ -20,7 +20,7 @@
 
 #include <range/v3/range_for.hpp>
 
-#include <wjfilesystem/path.h>
+#include <blocksci/fs.hpp>
 
 #include <iostream>
 #include <fstream>
@@ -36,8 +36,8 @@ protected:
     blocksci::State latestState;
 public:
     ParserIndex(const ParserConfigurationBase &config_, const std::string &resultName) : config(config_), cachePath(config_.parserDirectory()/(resultName + ".txt")) {
-        if (cachePath.exists()) {
-            std::ifstream inputFile(cachePath.str());
+        if (filesystem::exists(cachePath)) {
+            std::ifstream inputFile(cachePath.string());
             inputFile >> latestState;
         }
     }
@@ -46,7 +46,7 @@ public:
     ParserIndex(ParserIndex &&) = delete;
     ParserIndex &operator=(ParserIndex &&) = delete;
     ~ParserIndex() {
-        std::ofstream outputFile(cachePath.str());
+        std::ofstream outputFile(cachePath.string());
         outputFile << latestState;
     }
     

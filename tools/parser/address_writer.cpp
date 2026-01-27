@@ -10,12 +10,14 @@
 #include "address_writer.hpp"
 #include "preproccessed_block.hpp"
 
+#include <blocksci/fs.hpp>
+
 using blocksci::AddressType;
 using blocksci::DedupAddressType;
 
 AddressWriter::AddressWriter(const ParserConfigurationBase &config) :
 scriptFiles(blocksci::apply(blocksci::DedupAddressType::all(), [&] (auto tag) {
-    return (filesystem::path{config.dataConfig.scriptsDirectory()}/std::string{dedupAddressName(tag)}).str();
+    return (filesystem::path{config.dataConfig.scriptsDirectory()}/std::string{dedupAddressName(tag)}).string();
 })) {
 }
 
