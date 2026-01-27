@@ -1,3 +1,7 @@
+Updated to build on Ubuntu 24.04
+
+~~~~~~~~~~~~~~~~~~
+
 BlockSci
 ~~~~~~~~~~~~~~~~~~
 
