@@ -1,4 +1,4 @@
-Updated to build on Ubuntu 24.04
+Source code updated to build on Ubuntu 24.04 - Used Codex
 
 When downloading the btc blockchain set the blocksxor=0, otherwise blocks are obfuscated and blocks can't be parsed.
 
