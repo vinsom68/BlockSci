@@ -1,5 +1,17 @@
 Updated to build on Ubuntu 24.04
 
+When downloading the btc blockchain set the blocksxor=0, otherwise blocks are obfuscated and blocks can't be parsed.
+
+bitcoind -daemon \
+  -server=1 \
+  -txindex=1 \
+  -rpcuser=bitcoin \
+  -rpcpassword=bitcoin \
+  -rpcport=8332 \
+  -datadir=/media/user/BTC1/bitcoin \
+  -rpcallowip=0.0.0.0/0 \
+  -blocksxor=0 \
+
 ~~~~~~~~~~~~~~~~~~
 
 BlockSci
