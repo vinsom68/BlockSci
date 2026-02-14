@@ -102,6 +102,12 @@ if time.tzname != ('UTC', 'UTC'):
 def mapreduce_block_ranges(chain, map_func, reduce_func, init=MISSING_PARAM, start=None, end=None, cpu_count=psutil.cpu_count()):
     """Initialized multithreaded map reduce function over a stream of block ranges
     """
+    def reduce_mapped(results):
+        if isinstance(init, type(MISSING_PARAM)):
+            return reduce(reduce_func, results)
+        else:
+            return reduce(reduce_func, results, init)
+
     if start is None:
         start = 0
         if end is None:
@@ -112,7 +118,7 @@ def mapreduce_block_ranges(chain, map_func, reduce_func, init=MISSING_PARAM, sta
         end = blocks[-1].height
 
     if cpu_count == 1:
-        return mapFunc(chain[start:end])
+        return reduce_mapped([map_func(chain[start:end])])
 
     raw_segments = chain._segment_indexes(start, end, cpu_count)
     segments = [(raw_segment, chain.config_location, len(chain)) for raw_segment in raw_segments]
@@ -136,11 +142,8 @@ def mapreduce_block_ranges(chain, map_func, reduce_func, init=MISSING_PARAM, sta
     except (PermissionError, OSError):
         logger = logging.getLogger()
         logger.warning("Multiprocessing is unavailable; falling back to single-threaded execution.")
-        return map_func(chain[start:end])
-    if isinstance(init, type(MISSING_PARAM)):
-        return reduce(reduce_func, results)
-    else:
-        return reduce(reduce_func, results, init)
+        return reduce_mapped([map_func(chain[start:end])])
+    return reduce_mapped(results)
 
 
 def mapreduce_blocks(chain, map_func, reduce_func, init=MISSING_PARAM, start=None, end=None, cpu_count=psutil.cpu_count()):
