@@ -11,7 +11,7 @@
 
 #include <internal/file_mapper.hpp>
 
-#include <wjfilesystem/path.h>
+#include <blocksci/fs.hpp>
 
 #include <fstream>
 #include <vector>

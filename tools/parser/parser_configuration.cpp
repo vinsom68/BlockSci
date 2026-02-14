@@ -13,7 +13,7 @@
 #include <bitcoinapi/bitcoinapi.h>
 #endif
 
-#include <wjfilesystem/path.h>
+#include <blocksci/fs.hpp>
 
 #include <nlohmann/json.hpp>
 
@@ -24,23 +24,23 @@ ParserConfigurationBase::ParserConfigurationBase() : dataConfig() {}
 ParserConfigurationBase::ParserConfigurationBase(const blocksci::DataConfiguration &config) : dataConfig(config) {
     filesystem::path dir(parserDirectory());
     
-    if (!dir.exists()){
+    if (!filesystem::exists(dir)){
         filesystem::create_directory(dir);
     }
     
-    if (addressPath().exists()) {
+    if (filesystem::exists(addressPath())) {
         filesystem::create_directory(addressPath());
     }
     
-    if (!utxoAddressStatePath().exists()){
+    if (!filesystem::exists(utxoAddressStatePath())){
         filesystem::create_directory(utxoAddressStatePath());
     }
     
-    if (!utxoAddressStatePath().exists()){
+    if (!filesystem::exists(utxoAddressStatePath())){
         filesystem::create_directory(utxoAddressStatePath());
     }
     
-    if (!addressPath().exists()){
+    if (!filesystem::exists(addressPath())){
         filesystem::create_directory(addressPath());
     }
     
@@ -61,7 +61,7 @@ void ChainDiskConfiguration::resetHashFunc() {
 }
 
 void to_json(json& j, const ChainDiskConfiguration& p) {
-    j = json{{"blockMagic", p.blockMagic}, {"hashFuncName", p.hashFuncName}, {"coinDirectory", p.coinDirectory.str()}};
+    j = json{{"blockMagic", p.blockMagic}, {"hashFuncName", p.hashFuncName}, {"coinDirectory", p.coinDirectory.string()}};
 }
 
 void from_json(const json& j, ChainDiskConfiguration& p) {
@@ -167,4 +167,3 @@ BitcoinAPI ParserConfiguration<RPCTag>::createBitcoinAPI() const {
 }
 
 #endif
-

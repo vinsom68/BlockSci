@@ -11,6 +11,8 @@
 #include <blocksci/blocksci_export.h>
 #include <blocksci/core/address_types.hpp>
 
+#include <cstddef>
+#include <cstdint>
 #include <functional>
 
 namespace blocksci {

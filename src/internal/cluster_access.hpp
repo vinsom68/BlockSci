@@ -17,7 +17,7 @@
 
 #include <range/v3/view/subrange.hpp>
 
-#include <wjfilesystem/path.h>
+#include <blocksci/fs.hpp>
 
 namespace blocksci {
     template<DedupAddressType::Enum type>
@@ -57,32 +57,32 @@ namespace blocksci {
         DataAccess &access;
         
         ClusterAccess(const std::string &baseDirectory, DataAccess &access_) :
-        clusterOffsetFile((filesystem::path{baseDirectory}/"clusterOffsets").str()),
-        clusterScriptsFile((filesystem::path{baseDirectory}/"clusterAddresses").str()),
+        clusterOffsetFile((filesystem::path{baseDirectory}/"clusterOffsets").string()),
+        clusterScriptsFile((filesystem::path{baseDirectory}/"clusterAddresses").string()),
         scriptClusterIndexFiles(blocksci::apply(DedupAddressType::all(), [&] (auto tag) {
             std::stringstream ss;
             ss << dedupAddressName(tag) << "_cluster_index";
-            return (filesystem::path{baseDirectory}/ss.str()).str();
+            return (filesystem::path{baseDirectory}/ss.str()).string();
         })),
         access(access_)  {
-            if (!(filesystem::path{baseDirectory}/"clusterAddresses.dat").exists()) {
+            if (!filesystem::exists(filesystem::path{baseDirectory}/"clusterAddresses.dat")) {
                 throw std::runtime_error("Cluster data not found");
             }
         }
         
         static std::string offsetFilePath(const std::string &baseDirectory) {
-            return (filesystem::path{baseDirectory}/"clusterOffsets.dat").str();
+            return (filesystem::path{baseDirectory}/"clusterOffsets.dat").string();
         }
         
         static std::string addressesFilePath(const std::string &baseDirectory) {
-            return (filesystem::path{baseDirectory}/"clusterAddresses.dat").str();
+            return (filesystem::path{baseDirectory}/"clusterAddresses.dat").string();
         }
         
         static std::string typeIndexFilePath(const std::string &baseDirectory, DedupAddressType::Enum type) {
             filesystem::path base{baseDirectory};
             std::stringstream ss;
             ss << dedupAddressName(type) << "_cluster_index.dat";
-            return (base/ss.str()).str();
+            return (base/ss.str()).string();
         }
         
         uint32_t getClusterNum(const RawAddress &address) const {

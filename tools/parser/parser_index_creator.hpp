@@ -11,7 +11,9 @@
 #include "parser_configuration.hpp"
 #include "parser_fwd.hpp"
 
+#include <chrono>
 #include <future>
+#include <thread>
 
 namespace blocksci {
     struct State;

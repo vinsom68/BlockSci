@@ -13,7 +13,7 @@
 
 #include <blocksci/core/typedefs.hpp>
 
-#include <wjfilesystem/path.h>
+#include <blocksci/fs.hpp>
 
 #include <string>
 #include <vector>

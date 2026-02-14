@@ -15,3 +15,10 @@ blockscipy/dist/*
 .pytest_cache
 .idea
 .benchmarks
+.venv
+external/jsonrpccpp-compat/include
+external/bitcoin-api-cpp.diff
+test/blocksci/config.json
+build-dbg
+blocksci-data
+.fake

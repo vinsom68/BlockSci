@@ -17,7 +17,7 @@ namespace blocksci {
     void to_json(json& j, const ChainConfiguration& p) {
         j = json{
             {"coinName", p.coinName},
-            {"dataDirectory", p.dataDirectory.str()},
+            {"dataDirectory", p.dataDirectory.string()},
             {"pubkeyPrefix", p.pubkeyPrefix},
             {"scriptPrefix", p.scriptPrefix},
             {"segwitPrefix", p.segwitPrefix},

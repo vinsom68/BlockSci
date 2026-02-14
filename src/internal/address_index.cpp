@@ -54,12 +54,12 @@ namespace blocksci {
         rocksdb::DB *dbPtr;
         std::vector<rocksdb::ColumnFamilyHandle *> columnHandlePtrs;
         if (readonly) {
-            rocksdb::Status s = rocksdb::DB::OpenForReadOnly(options, path.str().c_str(), columnDescriptors, &columnHandlePtrs, &dbPtr);
+            rocksdb::Status s = rocksdb::DB::OpenForReadOnly(options, path.string().c_str(), columnDescriptors, &columnHandlePtrs, &dbPtr);
             if (!s.ok()) {
                 throw std::runtime_error{"Could not open address index with error: " + std::string{s.getState()}};
             }
         } else {
-            rocksdb::Status s = rocksdb::DB::Open(options, path.str().c_str(), columnDescriptors, &columnHandlePtrs, &dbPtr);
+            rocksdb::Status s = rocksdb::DB::Open(options, path.string().c_str(), columnDescriptors, &columnHandlePtrs, &dbPtr);
             if (!s.ok()) {
                 throw std::runtime_error{"Could not open address index with error: " + std::string{s.getState()}};
             }

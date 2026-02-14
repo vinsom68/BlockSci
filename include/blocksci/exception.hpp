@@ -18,7 +18,7 @@ namespace blocksci {
         InvalidAddressException(const InvalidAddressException &) = default;
         InvalidAddressException(InvalidAddressException &&) = default;
         InvalidAddressException &operator=(const InvalidAddressException &) = default;
-        InvalidAddressException &operator=(InvalidAddressException &&) = default;
+        InvalidAddressException &operator=(InvalidAddressException &&) = delete;
         virtual ~InvalidAddressException();
     };
 } // namespace blocksci

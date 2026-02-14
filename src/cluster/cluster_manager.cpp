@@ -25,13 +25,14 @@
 
 #include <dset/dset.h>
 
-#include <wjfilesystem/path.h>
+#include <blocksci/fs.hpp>
 
 #include <range/v3/view/iota.hpp>
 #include <range/v3/range_for.hpp>
 #include <fstream>
 #include <future>
 #include <map>
+#include <stdexcept>
 
 namespace {
     template <typename Job>
@@ -267,14 +268,14 @@ namespace blocksci {
         
         // Prepare cluster folder or fail
         auto outputLocationPath = filesystem::path{outputLocation};
-        if (outputLocationPath.exists()) {
-            if (!outputLocationPath.is_directory()) {
+        if (filesystem::exists(outputLocationPath)) {
+            if (!filesystem::is_directory(outputLocationPath)) {
                 throw std::runtime_error{"Path must be to a directory, not a file"};
             }
             if (!overwrite) {
                 for (auto &path : allPaths) {
                     auto filePath = filesystem::path{path};
-                    if (filePath.exists()) {
+                    if (filesystem::exists(filePath)) {
                         std::stringstream ss;
                         ss << "Overwrite is off, but " << filePath << " exists already";
                         throw std::runtime_error{ss.str()};
@@ -283,8 +284,8 @@ namespace blocksci {
             } else {
                 for (auto &path : allPaths) {
                     auto filePath = filesystem::path{path};
-                    if (filePath.exists()) {
-                        filePath.remove_file();
+                    if (filesystem::exists(filePath)) {
+                        filesystem::remove(filePath);
                     }
                 }
             }
@@ -336,6 +337,9 @@ namespace blocksci {
     
     template <typename ChangeFunc>
     ClusterManager createClusteringImpl(BlockRange &chain, ChangeFunc && changeHeuristic, const std::string &outputPath, bool overwrite, bool ignoreCoinJoin) {
+        if (chain.size() == 0) {
+            throw std::runtime_error("Cannot create clustering for an empty chain");
+        }
         prepareClusterDataLocation(outputPath, overwrite);
         
         // Perform clustering
@@ -357,7 +361,7 @@ namespace blocksci {
         auto parent = createClusters(chain, scriptStarts, static_cast<uint32_t>(totalScriptCount), std::forward<ChangeFunc>(changeHeuristic), ignoreCoinJoin);
         uint32_t clusterCount = remapClusterIds(parent);
         serializeClusterData(scripts, outputPath, parent, scriptStarts, clusterCount);
-        return {filesystem::path{outputPath}.str(), chain.getAccess()};
+        return {filesystem::path{outputPath}.string(), chain.getAccess()};
     }
     
     ClusterManager ClusterManager::createClustering(BlockRange &chain, const heuristics::ChangeHeuristic &changeHeuristic, const std::string &outputPath, bool overwrite, bool ignoreCoinJoin) {
@@ -373,5 +377,3 @@ namespace blocksci {
         return createClusteringImpl(chain, changeHeuristic, outputPath, overwrite, ignoreCoinJoin);
     }
 } // namespace blocksci
-
-

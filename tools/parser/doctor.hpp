@@ -12,7 +12,7 @@
 
 #include <sys/resource.h>
 
-#include <wjfilesystem/path.h>
+#include <blocksci/fs.hpp>
 #include <nlohmann/json.hpp>
 
 class BlockSciDoctor {

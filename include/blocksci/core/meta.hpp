@@ -9,7 +9,9 @@
 #define blocksci_meta_h
 
 #include <array>
+#include <cstddef>
 #include <tuple>
+#include <utility>
 
 namespace blocksci {
     namespace internal {

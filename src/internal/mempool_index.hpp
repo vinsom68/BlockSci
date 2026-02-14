@@ -13,7 +13,7 @@
 #include <range/v3/algorithm/upper_bound.hpp>
 #include <range/v3/view/transform.hpp>
 
-#include <wjfilesystem/path.h>
+#include <blocksci/fs.hpp>
 
 #include <chrono>
 

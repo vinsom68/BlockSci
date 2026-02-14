@@ -15,7 +15,7 @@
 
 #include <internal/data_configuration.hpp>
 
-#include <wjfilesystem/path.h>
+#include <blocksci/fs.hpp>
 
 #include <functional>
 
@@ -67,7 +67,7 @@ struct ParserConfigurationBase {
      * OutputLinkData links an output (InoutPointer) with the spending transaction (tx number)
      */
     std::string txUpdatesFilePath() const {
-        return (parserDirectory()/"txUpdates").str();
+        return (parserDirectory()/"txUpdates").string();
     }
 };
 

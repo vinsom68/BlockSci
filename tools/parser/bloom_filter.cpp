@@ -69,7 +69,7 @@ BloomFilterData::BloomFilterData(int64_t maxItems_, double fpRate_) : maxItems(m
 
 BloomFilterData loadData(const filesystem::path &path, int64_t maxItems, double fpRate) {
     BloomFilterData data{maxItems, fpRate};
-    std::ifstream file(path.str(), std::ios::binary);
+    std::ifstream file(path.string(), std::ios::binary);
     if (file.good()) {
         cereal::BinaryInputArchive ia(file);
         ia(data);
@@ -77,10 +77,10 @@ BloomFilterData loadData(const filesystem::path &path, int64_t maxItems, double 
     return data;
 }
 
-BloomFilter::BloomFilter(const std::string &path_, int64_t maxItems, double fpRate) : path(path_), impData(loadData(metaPath(), maxItems, fpRate)), store(storePath().str(), impData.length) {}
+BloomFilter::BloomFilter(const std::string &path_, int64_t maxItems, double fpRate) : path(path_), impData(loadData(metaPath(), maxItems, fpRate)), store(storePath().string(), impData.length) {}
 
 BloomFilter::~BloomFilter() {
-    std::ofstream file(metaPath().str(), std::ios::binary);
+    std::ofstream file(metaPath().string(), std::ios::binary);
     cereal::BinaryOutputArchive oa(file);
     oa(impData);
 }

@@ -12,6 +12,9 @@
 #include <blocksci/core/dedup_address_type.hpp>
 #include <blocksci/core/meta.hpp>
 
+#include <stdexcept>
+#include <string>
+
 #include <vector>
 
 namespace blocksci {

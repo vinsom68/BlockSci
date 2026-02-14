@@ -1,6 +1,42 @@
 import pytest
 import subprocess
 import os
+import json
+
+
+REGTEST_MAGIC = b"\xfa\xbf\xb5\xda"
+
+
+def _disk_dir(self_dir, chain_name):
+    env_key = "BLOCKSCI_{}_DISK_DIR".format(chain_name.upper())
+    override = os.environ.get(env_key)
+    if override:
+        return override
+    return "{}/../files/{}/regtest/".format(self_dir, chain_name)
+
+
+def _read_block_magic(disk_dir, chain_name):
+    blk_path = os.path.join(disk_dir, "blocks", "blk00000.dat")
+    if not os.path.exists(blk_path):
+        raise FileNotFoundError("Missing blk00000.dat for {} at {}".format(chain_name, blk_path))
+    with open(blk_path, "rb") as f:
+        magic_bytes = f.read(4)
+    return magic_bytes
+
+
+def _maybe_patch_block_magic(config_path, magic_bytes):
+    if magic_bytes == REGTEST_MAGIC:
+        return
+    magic_int = int.from_bytes(magic_bytes, byteorder="little", signed=False)
+    with open(config_path, "r") as f:
+        conf = json.load(f)
+    parser_cfg = conf.get("parser", {})
+    disk_cfg = parser_cfg.get("disk", {})
+    disk_cfg["blockMagic"] = magic_int
+    parser_cfg["disk"] = disk_cfg
+    conf["parser"] = parser_cfg
+    with open(config_path, "w") as f:
+        json.dump(conf, f, indent=4, sort_keys=True)
 
 
 def pytest_addoption(parser):
@@ -47,6 +83,8 @@ def chain(tmpdir_factory, chain_name):
     else:
         raise ValueError("Invalid chain name {}".format(chain_name))
 
+    disk_dir = _disk_dir(self_dir, chain_name)
+
     create_config_cmd = [
         "blocksci_parser",
         chain_dir + "/config.json",
@@ -54,7 +92,7 @@ def chain(tmpdir_factory, chain_name):
         blocksci_chain_name,
         chain_dir,
         "--disk",
-        "{}/../files/{}/regtest/".format(self_dir, chain_name),
+        disk_dir,
         "--max-block",
         "100",
     ]
@@ -62,6 +100,8 @@ def chain(tmpdir_factory, chain_name):
 
     # Parse the chain up to block 100 only
     subprocess.run(create_config_cmd, check=True)
+    magic_bytes = _read_block_magic(disk_dir, chain_name)
+    _maybe_patch_block_magic(chain_dir + "/config.json", magic_bytes)
     subprocess.run(parse_cmd, check=True)
 
     # Now parse the remainder of the chain

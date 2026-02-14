@@ -16,12 +16,11 @@ To parse the Bitcoin blockchain, BlockSci requires at least 60 GB of RAM (as of 
 Installation
 --------------
 
-Ubuntu 18.04
+Ubuntu 24.04
 ^^^^^^^^^^^^^
 
 ..  code-block:: bash
 
-    sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
     sudo apt-get update
     sudo apt install cmake libtool autoconf libboost-filesystem-dev libboost-iostreams-dev \
     libboost-serialization-dev libboost-thread-dev libboost-test-dev  libssl-dev libjsoncpp-dev \
@@ -32,12 +31,12 @@ Ubuntu 18.04
     cd BlockSci
     mkdir release
     cd release
-    CC=gcc-7 CXX=g++-7 cmake -DCMAKE_BUILD_TYPE=Release ..
+    CC=gcc CXX=g++ cmake -DCMAKE_BUILD_TYPE=Release ..
     make
     sudo make install
 
     cd ..
-    CC=gcc-7 CXX=g++-7 sudo -H pip3 install -e blockscipy
+    CC=gcc CXX=g++ sudo -H pip3 install -e blockscipy
 
 
 To avoid timestamp inconsistencies (i.e. pure Python ``datetime`` objects get adjusted to the local time zone, in contrast to numpy ``datetime64`` objects returned by ranges/iterators and the fluent interface), set the system clock to UTC:

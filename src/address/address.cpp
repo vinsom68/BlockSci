@@ -63,21 +63,22 @@ namespace blocksci {
         return getOutputPointers()
         | ranges::views::transform([_access, searchAddress](auto pointer) -> ranges::optional<Transaction> {
             auto spendingTx = Output(std::forward<decltype(pointer)>(pointer), *_access).getSpendingTx();
-            if (spendingTx) {
-                RANGES_FOR(auto input, spendingTx->inputs()) {
-                    if (input.getAddress() == searchAddress) {
-                        if (input.getSpentOutputPointer() == pointer) {
-                            return input.transaction();
-                        } else {
-                            return ranges::nullopt;
+                if (spendingTx) {
+                    RANGES_FOR(auto input, spendingTx->inputs()) {
+                        if (input.getAddress() == searchAddress) {
+                            if (input.getSpentOutputPointer() == pointer) {
+                                return input.transaction();
+                            } else {
+                                return ranges::nullopt;
+                            }
                         }
                     }
+                    assert(false);
+                    return ranges::nullopt;
+                } else {
+                    return ranges::nullopt;
                 }
-                assert(false);
-            } else {
-                return ranges::nullopt;
-            }
-        })
+            })
         | flatMapOptionals();
     }
     
@@ -346,4 +347,3 @@ namespace blocksci {
         return balance(height, outputs(getOutputPointers(), *access));
     }
 }
-

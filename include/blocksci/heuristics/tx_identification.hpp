@@ -12,6 +12,9 @@
 #include <blocksci/chain/chain_fwd.hpp>
 #include <blocksci/scripts/scripts_fwd.hpp>
 
+#include <cstddef>
+#include <cstdint>
+
 namespace blocksci {
     class DataAccess;
     namespace heuristics {
