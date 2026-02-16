@@ -4,6 +4,14 @@ project(blocksci_unittest)
 file(GLOB SRCS *.cpp)
 
 add_executable(blocksci_unittest EXCLUDE_FROM_ALL ${SRCS})
+target_sources(blocksci_unittest PRIVATE
+    ${CMAKE_SOURCE_DIR}/src/scripts/bitcoin_bech32.cpp
+    ${CMAKE_SOURCE_DIR}/src/scripts/bitcoin_segwit_addr.cpp
+)
+target_include_directories(blocksci_unittest PRIVATE
+    ${CMAKE_SOURCE_DIR}/src
+    ${CMAKE_SOURCE_DIR}/external/json/include
+)
 
 # target_compile_features(blocksci_unittest PUBLIC cxx_std_11)
 target_compile_options(blocksci_unittest PRIVATE -Wall -Wextra -Wpedantic)

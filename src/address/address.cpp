@@ -30,6 +30,8 @@
 
 #include <iostream>
 #include <sstream>
+#include <algorithm>
+#include <tuple>
 
 namespace blocksci {
     
@@ -249,6 +251,18 @@ namespace blocksci {
                     ranges::optional<uint32_t> addressNum = access.getHashIndex().getScriptHashIndex(scriptHash);
                     if (addressNum) {
                         return Address{*addressNum, AddressType::WITNESS_SCRIPTHASH, access};
+                    }
+                }
+            } else if (decoded.first > 0) {
+                auto count = access.getScripts().scriptCount(DedupAddressType::WITNESS_UNKNOWN);
+                for (uint32_t scriptNum = 1; scriptNum <= count; scriptNum++) {
+                    auto rawData = access.getScripts().getScriptData<DedupAddressType::WITNESS_UNKNOWN>(scriptNum);
+                    auto outputData = std::get<0>(rawData);
+                    if (outputData != nullptr &&
+                        outputData->witnessVersion == decoded.first &&
+                        outputData->scriptData.size() == decoded.second.size() &&
+                        std::equal(outputData->scriptData.begin(), outputData->scriptData.end(), decoded.second.begin())) {
+                        return Address{scriptNum, AddressType::WITNESS_UNKNOWN, access};
                     }
                 }
             }

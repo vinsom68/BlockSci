@@ -1,41 +1,52 @@
-Source code updated to build on Ubuntu 24.04 - Used Codex
-
-
-Build Instructions : 
-
-sudo apt-get update
-sudo apt install cmake libtool autoconf libboost-filesystem-dev libboost-iostreams-dev \
-  libboost-serialization-dev libboost-thread-dev libboost-test-dev libssl-dev libjsoncpp-dev \
-  libcurl4-openssl-dev libjsoncpp-dev libjsonrpccpp-dev libsnappy-dev zlib1g-dev libbz2-dev \
-  liblz4-dev libzstd-dev libjemalloc-dev libsparsehash-dev python3-dev python3-pip
-
-mkdir -p release
-cd release
-CC=gcc CXX=g++ cmake -DCMAKE_BUILD_TYPE=Release ..
-make
-sudo make install
-
-cd ..
-CC=gcc CXX=g++ sudo -H pip3 install -e blockscipy
-
-
-
-When downloading the btc blockchain set the blocksxor=0, otherwise blocks are obfuscated and blocks can't be parsed.
-
-bitcoind -daemon \
-  -server=1 \
-  -txindex=1 \
-  -rpcuser=bitcoin \
-  -rpcpassword=bitcoin \
-  -rpcport=8332 \
-  -datadir=/media/user/BTC1/bitcoin \
-  -rpcallowip=0.0.0.0/0 \
-  -blocksxor=0 \
-
-~~~~~~~~~~~~~~~~~~
-
 BlockSci
-~~~~~~~~~~~~~~~~~~
+========
+
+Local Setup Notes (Ubuntu 24.04)
+=================================
+
+Source code updated to build on Ubuntu 24.04 with the help of OpenAI Codex. 
+
+Install dependencies:
+
+.. code-block:: bash
+
+   sudo apt-get update
+   sudo apt install cmake libtool autoconf libboost-filesystem-dev libboost-iostreams-dev \
+     libboost-serialization-dev libboost-thread-dev libboost-test-dev libssl-dev libjsoncpp-dev \
+     libcurl4-openssl-dev libjsoncpp-dev libjsonrpccpp-dev libsnappy-dev zlib1g-dev libbz2-dev \
+     liblz4-dev libzstd-dev libjemalloc-dev libsparsehash-dev python3-dev python3-pip
+
+Build and install:
+
+.. code-block:: bash
+
+   mkdir -p release
+   cd release
+   CC=gcc CXX=g++ cmake -DCMAKE_BUILD_TYPE=Release ..
+   make
+   sudo make install
+   cd ..
+   CC=gcc CXX=g++ sudo -H pip3 install -e blockscipy
+
+Running Bitcoin Core for parsing
+--------------------------------
+
+When downloading the BTC blockchain, set ``blocksxor=0``. Otherwise blocks are obfuscated and cannot be parsed by BlockSci.
+
+.. code-block:: bash
+
+   bitcoind -daemon \
+     -server=1 \
+     -txindex=1 \
+     -rpcuser=bitcoin \
+     -rpcpassword=bitcoin \
+     -rpcport=8332 \
+     -datadir=/media/user/BTC1/bitcoin \
+     -rpcallowip=0.0.0.0/0 \
+     -blocksxor=0
+
+
+
 
 **As of November 2020, we are no longer actively developing or supporting BlockSci.** Please be aware that as cryptocurrencies continue to evolve, they may lose compatibility with BlockSci and might break it in unexpected ways.
 

@@ -7,6 +7,8 @@
 
 #include <blocksci/scripts/witness_unknown_script.hpp>
 
+#include "bitcoin_segwit_addr.hpp"
+
 #include <internal/address_info.hpp>
 #include <internal/data_access.hpp>
 #include <internal/script_access.hpp>
@@ -39,16 +41,32 @@ namespace blocksci {
     std::string ScriptAddress<AddressType::WITNESS_UNKNOWN>::getWitnessScriptString() const {
         return ScriptToAsmStr(getWitnessScript());
     }
+
+    std::string ScriptAddress<AddressType::WITNESS_UNKNOWN>::addressString() const {
+        std::vector<uint8_t> witprog;
+        witprog.insert(witprog.end(), getData()->scriptData.begin(), getData()->scriptData.end());
+        return segwit_addr::encode(getAccess().config.chainConfig, witnessVersion(), witprog);
+    }
     
     std::string ScriptAddress<AddressType::WITNESS_UNKNOWN>::toString() const {
         std::stringstream ss;
-        ss << "WitnessUnknownScript()";
+        auto address = addressString();
+        if (address.empty()) {
+            ss << "WitnessUnknownScript()";
+        } else {
+            ss << "WitnessUnknownAddress(" << address << ")";
+        }
         return ss.str();
     }
     
     std::string ScriptAddress<AddressType::WITNESS_UNKNOWN>::toPrettyString() const {
         std::stringstream ss;
-        ss << "WitnessUnknownScript()";
+        auto address = addressString();
+        if (address.empty()) {
+            ss << "WitnessUnknownScript()";
+        } else {
+            ss << "WitnessUnknownAddress(" << address << ", witness_version=" << int(witnessVersion()) << ")";
+        }
         return ss.str();
     }
 } // namespace blocksci
