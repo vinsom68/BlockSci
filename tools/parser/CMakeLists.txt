@@ -12,7 +12,7 @@ file(GLOB PARSER_SOURCES "*.cpp")
 set_source_files_properties(main.cpp PROPERTIES COMPILE_FLAGS "-Wno-reserved-id-macro -Wno-sign-conversion -Wno-extra-semi -Wno-undefined-func-template")
 
 add_executable(blocksci_parser ${PARSER_SOURCES} ${PARSER_HEADERS})
-set_target_properties(blocksci_parser PROPERTIES CXX_STANDARD 14 CXX_STANDARD_REQUIRED ON)
+set_target_properties(blocksci_parser PROPERTIES CXX_STANDARD 20 CXX_STANDARD_REQUIRED ON)
 target_include_directories(blocksci_parser BEFORE PRIVATE ${CMAKE_SOURCE_DIR}/external/jsonrpccpp-compat/include)
 
 set_target_properties(blocksci_parser PROPERTIES CXX_VISIBILITY_PRESET hidden)
