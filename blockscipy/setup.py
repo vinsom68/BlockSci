@@ -43,6 +43,7 @@ class CMakeBuild(build_ext):
                 blocksci_dir = candidate
         if blocksci_dir:
             cmake_args.append('-Dblocksci_DIR=' + blocksci_dir)
+        pybind11_found = False
         try:
             import pybind11  # noqa: F401
             pybind11_dir = subprocess.check_output(
@@ -51,8 +52,16 @@ class CMakeBuild(build_ext):
             ).strip()
             if pybind11_dir:
                 cmake_args.append('-Dpybind11_DIR=' + pybind11_dir)
+                pybind11_found = True
         except Exception:
-            pass
+            pybind11_found = False
+
+        if not pybind11_found and sys.version_info >= (3, 11):
+            raise RuntimeError(
+                "Python 3.11+ requires external pybind11>=2.12. "
+                "Install it in the build environment (for example: "
+                "`python -m pip install pybind11>=2.12`)."
+            )
 
         cfg = 'Debug' if self.debug else 'Release'
         build_args = ['--config', cfg]

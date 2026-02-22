@@ -1,5 +1,3 @@
-BlockSci
-========
 
 Local Setup Notes (Ubuntu 24.04)
 =================================
@@ -10,13 +8,14 @@ Install dependencies:
 
 .. code-block:: bash
 
-sudo apt-get update && sudo apt-get install -y \
-  git cmake libtool autoconf \
-  libboost-filesystem-dev libboost-iostreams-dev libboost-serialization-dev \
-  libboost-thread-dev libboost-test-dev \
-  libssl-dev libjsoncpp-dev libcurl4-openssl-dev libjsonrpccpp-dev \
-  libsnappy-dev zlib1g-dev libbz2-dev liblz4-dev libzstd-dev \
-  libjemalloc-dev libsparsehash-dev python3-dev python3-pip
+   sudo apt-get update && sudo apt-get install -y \
+     git cmake libtool autoconf \
+     libboost-filesystem-dev libboost-iostreams-dev libboost-serialization-dev \
+     libboost-thread-dev libboost-test-dev \
+     libssl-dev libjsoncpp-dev libcurl4-openssl-dev libjsonrpccpp-dev \
+     libsnappy-dev zlib1g-dev libbz2-dev liblz4-dev libzstd-dev \
+     libjemalloc-dev libsparsehash-dev \
+     python3-venv python3-dev python3-pip
 
 Build and install:
 
@@ -27,7 +26,6 @@ Build and install:
    cd BlockSci
 
    #build
-   rm -rf release
    mkdir -p release
    cd release
    CC=gcc CXX=g++ cmake -DCMAKE_BUILD_TYPE=Release ..
@@ -36,7 +34,19 @@ Build and install:
    
    #python package (optional)
    cd ..
-   CC=gcc CXX=g++ sudo -H pip3 install -e blockscipy
+   python3 -m venv .venv
+   source .venv/bin/activate
+   python -m pip install -U pip setuptools wheel
+   CC=gcc CXX=g++ python -m pip install -e blockscipy
+
+
+Notes:
+
+- ``blockscipy`` requires a modern ``pybind11`` at build time. It is provided via ``blockscipy/pyproject.toml``.
+- Use a virtual environment for Python package installation on Ubuntu 24.04+ (PEP 668).
+
+
+
 
 Running Bitcoin Core for parsing
 --------------------------------
