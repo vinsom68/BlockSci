@@ -26,7 +26,6 @@ Build and install:
    cd BlockSci
 
    #build
-   rm -rf release
    mkdir -p release
    cd release
    CC=gcc CXX=g++ cmake -DCMAKE_BUILD_TYPE=Release ..
