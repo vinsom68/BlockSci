@@ -5,10 +5,10 @@ set (CMAKE_CXX_STANDARD 17)
 
 find_package(blocksci REQUIRED)
 
-find_package(pybind11 CONFIG QUIET)
+find_package(pybind11 2.12 CONFIG QUIET)
 if(NOT pybind11_FOUND AND DEFINED ENV{PYBIND11_DIR})
     set(pybind11_DIR "$ENV{PYBIND11_DIR}" CACHE PATH "" FORCE)
-    find_package(pybind11 CONFIG QUIET)
+    find_package(pybind11 2.12 CONFIG QUIET)
 endif()
 if(NOT pybind11_FOUND)
     add_subdirectory(blocksci/pybind11)

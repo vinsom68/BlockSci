@@ -1,41 +1,76 @@
-Source code updated to build on Ubuntu 24.04 - Used Codex
+
+Local Setup Notes (Ubuntu 24.04)
+=================================
+
+Source code updated to build on Ubuntu 24.04 with the help of OpenAI Codex. 
+
+Install dependencies:
+
+.. code-block:: bash
+
+   sudo apt-get update && sudo apt-get install -y \
+     git cmake libtool autoconf \
+     libboost-filesystem-dev libboost-iostreams-dev libboost-serialization-dev \
+     libboost-thread-dev libboost-test-dev \
+     libssl-dev libjsoncpp-dev libcurl4-openssl-dev libjsonrpccpp-dev \
+     libsnappy-dev zlib1g-dev libbz2-dev liblz4-dev libzstd-dev \
+     libjemalloc-dev libsparsehash-dev \
+     python3-venv python3-dev python3-pip
+
+Build and install:
+
+.. code-block:: bash
+
+   #fresh clone with submodules
+   git clone --recurse-submodules https://github.com/vinsom68/BlockSci.git
+   cd BlockSci
+
+   #build
+   rm -rf release
+   mkdir -p release
+   cd release
+   CC=gcc CXX=g++ cmake -DCMAKE_BUILD_TYPE=Release ..
+   make -j"$(nproc)"
+   sudo make install
+   
+   #python package (optional)
+   cd ..
+   python3 -m venv .venv
+   source .venv/bin/activate
+   python -m pip install -U pip setuptools wheel
+   CC=gcc CXX=g++ python -m pip install -e blockscipy
 
 
-Build Instructions : 
 
-sudo apt-get update
-sudo apt install cmake libtool autoconf libboost-filesystem-dev libboost-iostreams-dev \
-  libboost-serialization-dev libboost-thread-dev libboost-test-dev libssl-dev libjsoncpp-dev \
-  libcurl4-openssl-dev libjsoncpp-dev libjsonrpccpp-dev libsnappy-dev zlib1g-dev libbz2-dev \
-  liblz4-dev libzstd-dev libjemalloc-dev libsparsehash-dev python3-dev python3-pip
 
-mkdir -p release
-cd release
-CC=gcc CXX=g++ cmake -DCMAKE_BUILD_TYPE=Release ..
-make
-sudo make install
+Notes:
 
-cd ..
-CC=gcc CXX=g++ sudo -H pip3 install -e blockscipy
+- ``blockscipy`` requires a modern ``pybind11`` at build time. It is provided via ``blockscipy/pyproject.toml``.
+- Use a virtual environment for Python package installation on Ubuntu 24.04+ (PEP 668).
 
 
 
-When downloading the btc blockchain set the blocksxor=0, otherwise blocks are obfuscated and blocks can't be parsed.
 
-bitcoind -daemon \
-  -server=1 \
-  -txindex=1 \
-  -rpcuser=bitcoin \
-  -rpcpassword=bitcoin \
-  -rpcport=8332 \
-  -datadir=/media/user/BTC1/bitcoin \
-  -rpcallowip=0.0.0.0/0 \
-  -blocksxor=0 \
 
-~~~~~~~~~~~~~~~~~~
+Running Bitcoin Core for parsing
+--------------------------------
 
-BlockSci
-~~~~~~~~~~~~~~~~~~
+When downloading the BTC blockchain, set ``blocksxor=0``. Otherwise blocks are obfuscated and cannot be parsed by BlockSci.
+
+.. code-block:: bash
+
+   bitcoind -daemon \
+     -server=1 \
+     -txindex=1 \
+     -rpcuser=bitcoin \
+     -rpcpassword=bitcoin \
+     -rpcport=8332 \
+     -datadir=/media/user/BTC1/bitcoin \
+     -rpcallowip=0.0.0.0/0 \
+     -blocksxor=0
+
+
+
 
 **As of November 2020, we are no longer actively developing or supporting BlockSci.** Please be aware that as cryptocurrencies continue to evolve, they may lose compatibility with BlockSci and might break it in unexpected ways.
 
