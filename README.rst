@@ -10,21 +10,31 @@ Install dependencies:
 
 .. code-block:: bash
 
-   sudo apt-get update
-   sudo apt install cmake libtool autoconf libboost-filesystem-dev libboost-iostreams-dev \
-     libboost-serialization-dev libboost-thread-dev libboost-test-dev libssl-dev libjsoncpp-dev \
-     libcurl4-openssl-dev libjsoncpp-dev libjsonrpccpp-dev libsnappy-dev zlib1g-dev libbz2-dev \
-     liblz4-dev libzstd-dev libjemalloc-dev libsparsehash-dev python3-dev python3-pip
+sudo apt-get update && sudo apt-get install -y \
+  git cmake libtool autoconf \
+  libboost-filesystem-dev libboost-iostreams-dev libboost-serialization-dev \
+  libboost-thread-dev libboost-test-dev \
+  libssl-dev libjsoncpp-dev libcurl4-openssl-dev libjsonrpccpp-dev \
+  libsnappy-dev zlib1g-dev libbz2-dev liblz4-dev libzstd-dev \
+  libjemalloc-dev libsparsehash-dev python3-dev python3-pip
 
 Build and install:
 
 .. code-block:: bash
 
+   #fresh clone with submodules
+   git clone --recurse-submodules https://github.com/vinsom68/BlockSci.git
+   cd BlockSci
+
+   #build
+   rm -rf release
    mkdir -p release
    cd release
    CC=gcc CXX=g++ cmake -DCMAKE_BUILD_TYPE=Release ..
-   make
+   make -j"$(nproc)"
    sudo make install
+   
+   #python package (optional)
    cd ..
    CC=gcc CXX=g++ sudo -H pip3 install -e blockscipy
 
