@@ -18,6 +18,7 @@ import re
 import heapq
 import operator
 import time
+import ctypes
 from functools import reduce
 
 import psutil
@@ -25,6 +26,36 @@ from multiprocess import Pool
 import dateparser
 from dateutil.relativedelta import relativedelta
 import pandas as pd
+
+
+def _preload_libblocksci():
+    """Best-effort preload so editable installs work without system-wide ldconfig."""
+    if sys.platform.startswith("win"):
+        return
+
+    env_path = os.environ.get("BLOCKSCI_LIB_PATH")
+    candidates = [env_path] if env_path else []
+
+    repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+    candidates.extend(
+        [
+            os.path.join(repo_root, "release", "src", "libblocksci.so"),
+            os.path.join(repo_root, "build", "src", "libblocksci.so"),
+            os.path.join(repo_root, "build-dbg", "src", "libblocksci.so"),
+        ]
+    )
+
+    for lib_path in candidates:
+        if not lib_path or not os.path.exists(lib_path):
+            continue
+        try:
+            ctypes.CDLL(lib_path, mode=ctypes.RTLD_GLOBAL)
+            return
+        except OSError:
+            continue
+
+
+_preload_libblocksci()
 
 from ._blocksci import *
 from ._blocksci import _traverse
